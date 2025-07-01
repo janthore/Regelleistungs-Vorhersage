@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 from typing import Optional, Union
-
+import pickle
 import numpy as np
 import numpy.typing as npt
 import pymc as pm

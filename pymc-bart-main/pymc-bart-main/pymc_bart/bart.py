@@ -14,6 +14,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import pickle
+
 import warnings
 from multiprocessing import Manager
 from typing import Optional
@@ -50,8 +52,9 @@ class BARTRV(RandomVariable):
 
     @classmethod
     def rng_fn(  # pylint: disable=W0237
-        cls, rng=None, X=None, Y=None, m=None, alpha=None, beta=None, size=None
+        cls, rng=None, X=None, Y=None, m=None, alpha=None, beta=None, size=None,
     ):
+        print(size)
         if not size:
             size = None
 
