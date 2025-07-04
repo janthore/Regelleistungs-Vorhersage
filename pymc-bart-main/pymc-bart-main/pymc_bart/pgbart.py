@@ -129,8 +129,12 @@ class PGBART(ArrayStepShared):
         batch: tuple[float, float] = (0.1, 0.1),
         model: Optional[Model] = None,
         initial_point: PointType | None = None,
-        compile_kwargs: dict | None = None,
+
+
+    compile_kwargs: dict | None = None,
     ) -> None:
+        #Counter der einfach durchzählt wie oft das ganze schon durchlaufen wurde:
+        self.full_dataset_passes = 0
         model = modelcontext(model)
         if initial_point is None:
             initial_point = model.initial_point()
@@ -218,8 +222,9 @@ class PGBART(ArrayStepShared):
         self.uniform = UniformSampler(0, 1)
         self.prior_prob_leaf_node = compute_prior_probability(self.bart.alpha, self.bart.beta)
         self.ssv = SampleSplittingVariable(self.alpha_vec)
-
+        #Hier wird die "Einschwing" Phase aufgehoben, ab jetzt zahlen alle Bäume
         self.tune = True
+
 
         batch_0 = max(1, int(self.m * batch[0]))
         batch_1 = max(1, int(self.m * batch[1]))
@@ -244,6 +249,8 @@ class PGBART(ArrayStepShared):
         tree_ids = range(self.lower, upper)
         self.lower = upper if upper < self.m else 0
 
+        self.full_dataset_passes += 1
+        print(f"✅ Vollständiger Datensatz-Durchlauf Nummer: {self.full_dataset_passes}")
         for odim in range(self.trees_shape):
             for tree_id in tree_ids:
                 self.iter += 1
@@ -282,6 +289,7 @@ class PGBART(ArrayStepShared):
                     normalized_weights = self.normalize(particles[1:])
 
                     # Resample
+                    #Schlechte Partikel sterben, gute werden öfter kopiert
                     particles = self.resample(particles, normalized_weights)
 
                 normalized_weights = self.normalize(particles)
@@ -297,6 +305,7 @@ class PGBART(ArrayStepShared):
 
                 if self.tune:
                     # Update the splitting variable and the splitting variable sampler
+                    # Erhöht die Wahrscheinlichkeit zukünftiger Splits auf starkem Feature
                     if self.iter > self.m:
                         self.ssv = SampleSplittingVariable(self.alpha_vec)
 
@@ -313,7 +322,7 @@ class PGBART(ArrayStepShared):
                     # update the variable inclusion
                     for index in new_tree.get_split_variables():
                         variable_inclusion[index] += 1
-
+        #Wenn die Einschwing Phase vorbei ist, speichern wir die Bäume
         if not self.tune:
             self.bart.all_trees.append(self.all_trees)
 

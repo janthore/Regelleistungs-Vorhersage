@@ -19,9 +19,11 @@ def run_bart_model():
         σ = pm.HalfNormal("σ", 1)
         y_obs = pm.Normal("y_obs", mu=μ, sigma=σ, observed=Y)
 
-        trace = pm.sample(1000, chains=2, tune=1000, target_accept=0.9)
+        trace = pm.sample(1000, chains=4, cores=4, tune=1000, target_accept=0.9)
+        real_trees = [list(chain) for chain in model.μ.owner.op.all_trees]
         with open("final_bart_trees.pkl", "wb") as f:
-            pickle.dump(model.μ.owner.op.all_trees, f)
+            pickle.dump(real_trees, f)
+
 
 if __name__ == "__main__":
     run_bart_model()

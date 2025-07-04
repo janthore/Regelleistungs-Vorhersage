@@ -125,7 +125,7 @@ class BART(Distribution):
     This is the recommend prior by Chipman Et al. BART: Bayesian additive regression trees,
     `link <https://doi.org/10.1214/09-AOAS285>`__
     """
-
+    #Klasse funktioniert wie ein Kunstruktor, dient zur initialisierung von relevanten Variablen
     def __new__(
         cls,
         name: str,
@@ -146,7 +146,7 @@ class BART(Distribution):
                 + "Use with caution."
             )
         manager = Manager()
-        cls.all_trees = manager.list()
+        cls.all_trees = manager.list() #Liste die von dem Multiprocessing aus unterschiedlichen Bereichen genutzt werden kann
 
         X, Y = preprocess_xy(X, Y)
 
