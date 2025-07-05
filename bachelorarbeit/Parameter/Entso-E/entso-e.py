@@ -60,7 +60,7 @@ def get_entsoe_data(data_type: str, country_code: str, start_date: str, end_date
 
 if __name__ == "__main__":
     from datetime import date
-    start_date = date(2025, 5, 1)
+    start_date = date(2020, 5, 1)
     end_date = date(2025, 6, 1)
-    ausfälle = get_entsoe_data("unavailability_of_generation_unit",ünb[0], start_date, end_date)
+    ausfälle = get_entsoe_data("unavailability_generation_units",ünb[1], start_date, end_date)
     ausfälle.to_csv("ausfälle.csv", index=True)
